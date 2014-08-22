@@ -6,9 +6,26 @@ An extensible hub for home automation/Internet of Things.
 
 Cherry acts as a hub for your house and allows any connected component to communicate with each other. Cherry's power comes from its plugin system. Connected devices talk to each other through the _firehose_, a message bus provided by Cherry. Adding a new component to the system is as simple as writing a few lines of code (Node.js module or ClojureScript namespace).
 
-As an example, a Philips Hue plugin could wait for "to:lights" messages on the firehose and flip the lights in response. A GPIO plugin could send "from:pin" messages when a button is pressed on the Raspberry Pi. Finally, another plugin could read "from:pin" messages and turns them into "to:lights" messages. Boum, lights turn on and off when a button is pressed.
+As an example, a Philips Hue plugin could wait for "to:lights" messages on the firehose and flip the lights in response. A GPIO plugin could send "from:pin" messages when a button is pressed on the Raspberry Pi. Finally, another plugin could read "from:pin" messages and turns them into "to:lights" messages. Boum, lights turn on and off when a button is pressed. This is easily expressed in code:
 
-Cherry also acts as a repository for home automation/IoT plugins. We provide a few plugins out-of-the-box (Hue, HipChat, Wit, Mopidy, GPIO, etc.) and will accept pull requests for other systems.
+```javascript
+module.exports = function (ec) {
+  console.log("lightswitch ready to rock");
+
+  ec.consume(function (msg) {
+    console.log("lightswitch received", require('util').inspect(msg));
+    switch (msg.from) {
+      case "pin":
+        if (msg.body === "low") {
+          ec.produce({to: "lights", body: {on: true}});
+        } else if (msg.body === "high") {
+          ec.produce({to: "lights", body: {on: false}});
+        }
+        break;
+    };
+  });
+}
+```
 
 ## Using
 
