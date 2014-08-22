@@ -30,15 +30,15 @@ module.exports = function (ec) {
 ## Using
 
 ```bash
-lein do cljsbuild clean, cljsbuild once
-cp config.json.sample config.json
-node dist/cherry.js
+npm install -g cherry-core
+cherry path/to/config.json
 ```
 
-## Building
+## Dev
 
 ```bash
-lein do cljsbuild clean, cljsbuild once
+lein do cljsbuild clean, cljsbuild auto
+cp config.json.sample config.json
 node dist/cherry.js
 ```
 
