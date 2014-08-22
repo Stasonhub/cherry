@@ -1,0 +1,27 @@
+{
+  "port": 4433,
+  "witd_url": "http://192.168.1.68:8080",
+  "wit_token": "MY_WIT_TOKEN",
+  "hipchat_jid": "38888_1000000@chat.hipchat.com",
+  "hipchat_pwd": "mypwd",
+  "hipchat_room": "38888_myroom@conf.hipchat.com/Cherry",
+  "hue_host": "http://192.168.1.169",
+  "hue_user": "willyblandin",
+  "mopidy_url": "ws://192.168.1.66:6680/mopidy/ws",
+  "demo_port": 5576,
+  "gpio_pins": {
+    "22": ["in", "both"]
+  },
+  "unused": [
+    "cherry.integration.myo",
+    "cherry.integration.mopidy"
+  ],
+  "plugins": [
+    "./examples/wit_office.js",
+    "cherry.integration.hipchat",
+    "cherry.integration.demo_home",
+    "cherry.integration.wit",
+    "cherry.integration.hue",
+    "cherry.integration.gpio"
+  ]
+}

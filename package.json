@@ -1,0 +1,38 @@
+{
+  "name": "cherry",
+  "version": "0.1.0",
+  "description": "Home automation nerve center",
+  "keywords": ["home automation", "home", "automation", "voice", "pi", "raspberry"],
+  "main": "cherry.js",
+  "dependencies": {
+    "node-xmpp": "1.0.0-alpha2",
+    "onoff": "^0.3.2",
+    "request": "2.39.0",
+    "ws": "^0.4.31"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wit-ai/cherry.git"
+  },
+  "author": "Willy <willy@wit.ai>",
+  "contributors": [
+    {
+      "name": "Oliv",
+      "email": "oliv@wit.ai"
+    },
+    {
+      "name": "Stepan",
+      "email": "stepan@wit.ai"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wit-ai/cherry/issues"
+  },
+  "homepage": "https://github.com/wit-ai/cherry",
+  "bin": { "cherry": "./cherry.js" }
+}
