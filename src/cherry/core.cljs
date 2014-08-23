@@ -30,10 +30,15 @@
 (defn load-js-module! [m paths ch]
   (loop [ps paths]
     (if-let [p (first ps)]
-      (let [full (str p "/" m)
+      (let [full (.join path p m)
             f (try
                 (js/require full)
-                (catch :default e nil))]
+                (catch :default e
+                  (if-let [[_ not-found] (re-find #"Cannot find module '(.*)'" (.-message e))]
+                    (when-not (= full not-found)
+                      (js/console.log (.-stack e)))
+                    (js/console.log (.-stack e)))
+                  nil))]
         (or f (recur (next ps))))
       (throw (str "could not find " m " in " (.inspect util (clj->js paths)))))))
 

@@ -34,18 +34,48 @@ npm install -g cherry-core
 cherry path/to/config.json
 ```
 
-## Dev
+`config.json` looks something like that (cf. config.json.sample):
 
-```bash
-lein do cljsbuild clean, cljsbuild auto
-cp config.json.sample config.json
-node dist/cherry.js
+```json
+{
+  "port": 4433,
+  "witd_url": "http://192.168.1.68:8080",
+  "wit_token": "MY_WIT_TOKEN",
+  "hipchat_jid": "38888_1000000@chat.hipchat.com",
+  "hipchat_pwd": "mypwd",
+  "hipchat_room": "38888_myroom@conf.hipchat.com/Cherry",
+  "hue_host": "http://192.168.1.169",
+  "hue_user": "willyblandin",
+  "mopidy_url": "ws://192.168.1.66:6680/mopidy/ws",
+  "demo_port": 5576,
+  "gpio_pins": {
+    "22": ["in", "both"]
+  },
+  "plugins": [
+    "./examples/lightswitch.js",
+    "cherry-spotify",
+    "cherry.integration.hipchat",
+    "cherry.integration.wit",
+    "cherry.integration.hue",
+    "cherry.integration.gpio"
+  ]
+}
 ```
+
+## Using existing plugins
+
+In your `config.json` file, you specify the list of plugins you want to use.
+
+Each item can either be:
+- the name of a globally or locally installed npm package, e.g. `cherry-spotify`
+- a path to a Javascript file, e.g. `./examples/lightswitch.js`
+- a ClojureScript module (we're still figuring out how to allow cljs plugins)
+- a CoffeeScript file (coming soon...)
 
 ## Creating a plugin
 
 We've focused on making it really simple and easy to write a plugin for Cherry.
-cf. `examples` directory, or below:
+You can check the `examples` directory, [cherry-spotify](https://github.com/wit-ai/cherry-spotify) or below:
 
 ```bash
 mkdir cherry-logger
@@ -66,15 +96,6 @@ npm publish
 ## Built-in plugins
 
 You can configure plugins through a `config.json` file.
-
-### Mopidy
-
-Consumes: "to:music"
-Produces: "from:music" with music info
-
-```
-"mopidy_url": "ws://192.168.1.66:6680/mopidy/ws"
-```
 
 ### Hue
 
@@ -114,3 +135,25 @@ Produces: "from:pin"
   "22": ["in", "both"]
 },
 ```
+
+### Mopidy
+
+Consumes: "to:music"
+Produces: "from:music" with music info
+
+```
+"mopidy_url": "ws://192.168.1.66:6680/mopidy/ws"
+```
+
+## Dev
+
+```bash
+lein do cljsbuild clean, cljsbuild auto
+cp config.json.sample config.json
+node dist/cherry.js
+```
+
+## TODO
+
+- allow CoffeeScript plugins
+- figure out how to allow CLJS plugins
