@@ -45,7 +45,23 @@ node dist/cherry.js
 ## Creating a plugin
 
 We've focused on making it really simple and easy to write a plugin for Cherry.
-cf. `examples` directory
+cf. `examples` directory, or below:
+
+```bash
+mkdir cherry-logger
+npm init
+
+cat > index.js <<EOF
+module.exports = function (ec) {
+  console.log("logging msg!");
+  ec.consume(function(msg) {
+    console.log("got", require('util').inspect(msg));
+  });
+}
+EOF
+
+npm publish
+```
 
 ## Built-in plugins
 
