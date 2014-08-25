@@ -30,7 +30,7 @@
 (defn absolute? [x]
   (-> (first x) (= (.-sep path))))
 
-(defn load-js-module! [m paths ch]
+(defn load-js-module! [m paths]
   (let [req #(try
                (js/require %)
                (catch :default e
@@ -48,20 +48,23 @@
             (or f (recur (next ps))))
           (throw (str "could not find " m " in " (.inspect util (clj->js paths)))))))))
 
-(defn load-cljs-module! [m paths ch]
+(defn load-cljs-module! [m paths]
   (aget (js/eval m) "init"))
 
-(defn load-module! [config firehose m paths ch]
+(defn load-module! [config firehose m paths mult]
   (let [f (if (cljs? m)
-            (load-cljs-module! m paths ch)
-            (load-js-module! m paths ch))]
+            (load-cljs-module! m paths)
+            (load-js-module! m paths))]
     (f #js {:consume (fn [h]
-                       (go-loop []
-                         (let [[sender msg] (<! ch)]
-                           (when (and (not (nil? msg))
-                                      (not (= m sender)))
-                             (h (clj->js msg)))
-                           (recur))))
+                       (let [ch (chan)]
+                         (async/tap mult ch)
+                         (go-loop []
+                           (let [[sender msg] (<! ch)]
+                             (println m "consumed" msg)
+                             (when (and (not (nil? msg))
+                                        (not (= m sender)))
+                               (h (clj->js msg)))
+                             (recur)))))
             :config config
             :produce (fn [x]
                        (println ">" (str m ":") x)
@@ -75,9 +78,7 @@
         mult (async/mult firehose)]
     (doseq [m modules]
       (println "> Loading" m)
-      (let [ch (chan)]
-        (async/tap mult ch)
-        (load-module! config firehose m paths ch)))))
+      (load-module! config firehose m paths mult))))
 
 (defn load-config! [p]
   (-> (.readFileSync fs p) (js/JSON.parse)))
