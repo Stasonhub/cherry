@@ -60,7 +60,7 @@
                          (async/tap mult ch)
                          (go-loop []
                            (let [[sender msg] (<! ch)]
-                             (println m "consumed" msg)
+                             (util/debug m "consumed" msg)
                              (when (and (not (nil? msg))
                                         (not (= m sender)))
                                (h (clj->js msg)))
