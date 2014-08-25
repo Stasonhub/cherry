@@ -27,20 +27,26 @@
   (defn cljs? [p]
     (boolean (re-find re p))))
 
+(defn absolute? [x]
+  (-> (first x) (= (.-sep path))))
+
 (defn load-js-module! [m paths ch]
-  (loop [ps paths]
-    (if-let [p (first ps)]
-      (let [full (.join path p m)
-            f (try
-                (js/require full)
-                (catch :default e
-                  (if-let [[_ not-found] (re-find #"Cannot find module '(.*)'" (.-message e))]
-                    (when-not (= full not-found)
-                      (js/console.log (.-stack e)))
-                    (js/console.log (.-stack e)))
-                  nil))]
-        (or f (recur (next ps))))
-      (throw (str "could not find " m " in " (.inspect util (clj->js paths)))))))
+  (let [req #(try
+               (js/require %)
+               (catch :default e
+                 (if-let [[_ not-found] (re-find #"Cannot find module '(.*)'" (.-message e))]
+                   (when-not (= % not-found)
+                     (js/console.log (.-stack e)))
+                   (js/console.log (.-stack e)))
+                 nil))]
+    (if (absolute? m)
+      (req m)
+      (loop [ps paths]
+        (if-let [p (first ps)]
+          (let [full (.join path p m)
+                f (req full)]
+            (or f (recur (next ps))))
+          (throw (str "could not find " m " in " (.inspect util (clj->js paths)))))))))
 
 (defn load-cljs-module! [m paths ch]
   (aget (js/eval m) "init"))
