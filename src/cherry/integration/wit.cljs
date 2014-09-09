@@ -40,9 +40,8 @@
 (defn interpret [cfg q]
   (debug "interpreting" q)
   (go (case q
-        "start" (wit cfg "/audio" {:action "start"
-                                   :access_token (.-wit_token cfg)})
-        "stop" (<! (wit cfg "/audio" {:action "stop"}))
+        "start" (wit cfg "/start" {:access_token (.-wit_token cfg)})
+        "stop" (<! (wit cfg "/stop" {}))
         (let [wit-body (<! (wit cfg "/text" {:q q}))]
           wit-body))))
 
