@@ -2,9 +2,6 @@
   (:require [cljs.nodejs :as nodejs]
             [cljs.core.async :as async :refer [<! >! take! put! chan timeout close!]]
             [clojure.string :as string]
-            [cherry.integration.mopidy :as mopidy]
-            [cherry.integration.hipchat :as hipchat]
-            [cherry.integration.wit :as wit]
             [cherry.util :as util])
   (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]]))
 
@@ -79,7 +76,7 @@
                               (let [msg (js->clj x :keywordize-keys true)
                                     {:keys [from body]} msg]
                                 (if-let [h (get m (keyword from))]
-                                  (h (clj->js (clj->js body) (clj->js msg)))
+                                  (h (clj->js body) (clj->js msg))
                                   (util/debug "no mapping" from)))))))
             :register (fn [name g]
                         (if (get @plugins name)

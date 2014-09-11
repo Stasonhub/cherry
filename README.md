@@ -6,25 +6,22 @@ An extensible hub for home automation/Internet of Things.
 
 ## Overview
 
-Cherry acts as a hub for your house and allows any connected component to communicate with each other. Cherry's power comes from its plugin system. Connected devices talk to each other through the _firehose_, a message bus provided by Cherry. Adding a new component to the system is as simple as writing a few lines of code (Node.js module or ClojureScript namespace).
+Cherry acts as a hub for your house and allows any connected component to communicate with each other. Cherry's power comes from its plugin system. Connected devices can talk to each other. Adding a new component to the system is as simple as writing a few lines of code (Node.js module).
 
-As an example, a Philips Hue plugin could wait for "to:lights" messages on the firehose and flip the lights in response. A GPIO plugin could send "from:pin" messages when a button is pressed on the Raspberry Pi. Finally, another plugin could read "from:pin" messages and turns them into "to:lights" messages. Boum, lights turn on and off when a button is pressed. This is easily expressed in code:
+As an example, let's say you have a Philips Hue light and you want to turn it on by pressing a button. You just need a few lines of code:
 
 ```javascript
-module.exports = function (ec) {
+module.exports = function (cherry) {
   console.log("lightswitch ready to rock");
 
-  ec.consume(function (msg) {
-    console.log("lightswitch received", require('util').inspect(msg));
-    switch (msg.from) {
-      case "pin":
-        if (msg.body === "low") {
-          ec.produce({to: "lights", body: {on: true}});
-        } else if (msg.body === "high") {
-          ec.produce({to: "lights", body: {on: false}});
-        }
-        break;
-    };
+  cherry.handle({
+    pin: function (message) {
+      if (msg.body === "high") {
+        ec.produce({to: "lights", body: {on: true}});
+      } else if (msg.body === "low") {
+        ec.produce({to: "lights", body: {on: false}});
+      }
+    }
   });
 }
 ```
@@ -33,6 +30,8 @@ module.exports = function (ec) {
 
 ```bash
 npm install -g cherry-core
+# you may install additional plugins through npm
+# npm install -g cherry-wit cherry-spotify cherry-hue
 cherry path/to/config.json
 ```
 
@@ -48,18 +47,17 @@ cherry path/to/config.json
   "hipchat_room": "38888_myroom@conf.hipchat.com/Cherry",
   "hue_host": "http://192.168.1.169",
   "hue_user": "willyblandin",
-  "mopidy_url": "ws://192.168.1.66:6680/mopidy/ws",
   "demo_port": 5576,
   "gpio_pins": {
     "22": ["in", "both"]
   },
   "plugins": [
-    "./examples/lightswitch.js",
     "cherry-spotify",
+    "cherry-hue",
+    "cherry-wit",
+    "cherry-gpio",
     "cherry.integration.hipchat",
-    "cherry.integration.wit",
-    "cherry.integration.hue",
-    "cherry.integration.gpio"
+    "./contrib/cambridge.js",
   ]
 }
 ```
@@ -101,8 +99,6 @@ You can configure plugins through a `config.json` file.
 
 ### Hue
 
-Consumes: "to:lights"
-
 ```
 "hue_host": "http://192.168.1.169"
 ```
@@ -119,7 +115,7 @@ Produces: "from:chat"
 
 ### witd
 
-Produces: "from:semantic"
+Produces: "from:wit"
 
 ```
 "witd_url": "http://192.168.1.68:8080",
@@ -136,15 +132,6 @@ Produces: "from:pin"
 "gpio_pins": {
   "22": ["in", "both"]
 },
-```
-
-### Mopidy
-
-Consumes: "to:music"
-Produces: "from:music" with music info
-
-```
-"mopidy_url": "ws://192.168.1.66:6680/mopidy/ws"
 ```
 
 ## Dev
@@ -165,5 +152,4 @@ curl -s https://raw.githubusercontent.com/wit-ai/cherry/master/cambridge.sh | su
 
 ## TODO
 
-- allow CoffeeScript plugins
 - figure out how to allow CLJS plugins
