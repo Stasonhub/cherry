@@ -17,9 +17,9 @@ module.exports = function (cherry) {
   cherry.handle({
     pin: function (message) {
       if (msg.body === "high") {
-        ec.produce({to: "lights", body: {on: true}});
+        cherry.hue({on: true});
       } else if (msg.body === "low") {
-        ec.produce({to: "lights", body: {on: false}});
+        cherry.hue({on: false});
       }
     }
   });
