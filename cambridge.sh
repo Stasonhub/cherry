@@ -27,6 +27,8 @@
 #     pairwise=CCMP
 #     auth_alg=OPEN
 #   }
+#
+# wit instance id: 53dd3dff-274f-4c7a-ba2c-d25cd22d4651
 
 set -e -x
 
@@ -81,7 +83,7 @@ cat > $CHERRY_CONFIG <<EOF
 {
   "port": 4433,
   "witd_url": "http://localhost:9877",
-  "wit_token": "ASAYW7NKIBW63T5LRWT2MDWLYDHGZQG7",
+  "wit_token": "MY_WIT_TOKEN",
   "hipchat_jid": "38802_1058254@chat.hipchat.com",
   "hipchat_pwd": "my_hipchat_pw",
   "hipchat_room": "38802_witmusic@conf.hipchat.com/Electric Cherry",
