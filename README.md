@@ -1,3 +1,5 @@
+![cherry](/docs/cherry.png)
+
 # Cherry
 
 An extensible hub for home automation/Internet of Things.
