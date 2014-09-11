@@ -28,7 +28,8 @@
 #     auth_alg=OPEN
 #   }
 #
-# wit instance id: 53dd3dff-274f-4c7a-ba2c-d25cd22d4651
+# wit instance: oliviervaussy/Wit%20Office
+
 
 set -e -x
 
