@@ -16,10 +16,11 @@ module.exports = function (cherry) {
 
   cherry.handle({
     pin: function (message) {
-      if (msg.body === "high") {
-        cherry.hue({on: true});
-      } else if (msg.body === "low") {
-        cherry.hue({on: false});
+      var plugins = cherry.plugins();
+      if (message.state === "high") {
+        plugins.hue({on: true});
+      } else if (message.state === "low") {
+        plugins.hue({on: false});
       }
     }
   });
@@ -74,17 +75,25 @@ Each item can either be:
 ## Creating a plugin
 
 We've focused on making it really simple and easy to write a plugin for Cherry.
-You can check the `examples` directory, [cherry-spotify](https://github.com/wit-ai/cherry-spotify) or below:
+You can check the `examples` directory, [cherry-spotify](https://github.com/wit-ai/cherry-spotify), [cherry-hue](https://github.com/wit-ai/cherry-hue) or below:
 
 ```bash
 mkdir cherry-logger
 npm init
 
 cat > index.js <<EOF
-module.exports = function (ec) {
-  console.log("logging msg!");
-  ec.consume(function(msg) {
-    console.log("got", require('util').inspect(msg));
+module.exports = function (cherry) {
+  // listen for chat messages and turn lights on or play next song
+  cherry.handle({
+    chat: function (msg) {
+      var plugins = cherry.plugins();
+
+      if (msg === 'next song') {
+        plugins.spop('next');
+      } else if (msg === 'lights on') {
+        plugins.hue({on: true});
+      }
+    }
   });
 }
 EOF
@@ -96,41 +105,15 @@ npm publish
 
 You can configure plugins through a `config.json` file.
 
-### Hue
-
-```
-"hue_host": "http://192.168.1.169"
-```
-
 ### HipChat
 
-Produces: "from:chat"
+Note: this will be extracted into a `cherry-hipchat` plugin pretty soon.
+Produces: "from: chat"
 
 ```
 "hipchat_jid": "88888_8888888@chat.hipchat.com",
 "hipchat_pwd": "mypassword",
 "hipchat_room": "88888_yay@conf.hipchat.com/My Username",
-```
-
-### witd
-
-Produces: "from:wit"
-
-```
-"witd_url": "http://192.168.1.68:8080",
-"wit_token": "MY_TOKEN",
-```
-
-### GPIO
-
-Note: requires `sudo` to access pins on Raspberry Pi.
-
-Produces: "from:pin"
-
-```
-"gpio_pins": {
-  "22": ["in", "both"]
-},
 ```
 
 ## Dev

@@ -1,16 +1,13 @@
-module.exports = function (ec) {
+module.exports = function (cherry) {
   console.log("lightswitch ready to rock");
 
-  ec.consume(function (msg) {
-    console.log("lightswitch received", require('util').inspect(msg));
-    switch (msg.from) {
-      case "pin":
-        if (msg.body === "low") {
-          ec.produce({to: "lights", body: {on: true}});
-        } else if (msg.body === "high") {
-          ec.produce({to: "lights", body: {on: false}});
-        }
-        break;
-    };
+  cherry.handle({
+    pin: function (message) {
+      if (msg.body === "high") {
+        cherry.hue({on: true});
+      } else if (msg.body === "low") {
+        cherry.hue({on: false});
+      }
+    }
   });
 }

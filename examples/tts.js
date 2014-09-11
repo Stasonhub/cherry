@@ -19,12 +19,8 @@ Setup is as follow (Pi is .68, Mac is .246):
   "tts": { "host": "192.168.1.246", "port": 1334 }
 */
 
-module.exports = function (ec) {
-  ec.consume(function (msg) {
-    if (msg.to !== 'tts') {
-      return;
-    }
-
+module.exports = function (cherry) {
+  cherry.register('tts', function (msg) {
     console.log("[tts] got", msg);
 
     var socket;
@@ -45,6 +41,6 @@ module.exports = function (ec) {
       socket.destroy();
     });
 
-    socket.connect(ec.config.tts.port, ec.config.tts.host);
+    socket.connect(cherry.config.tts.port, cherry.config.tts.host);
   });
 }
