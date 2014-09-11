@@ -18,7 +18,7 @@
 # - configure wifi, e.g. in /etc/wpa_supplicant/wpa_supplicant.conf:
 #   ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 #   update_config=1
-#   
+#
 #   network={
 #     ssid="myssid"
 #     psk="mypwd"
@@ -73,12 +73,14 @@ NODE=node_latest_armhf.deb
 curl -L -O http://node-arm.herokuapp.com/$NODE
 dpkg -i $NODE
 
-# install cherry and cherry-spotify
+# install cherry and its plugins
 chown -R $SUDO_USER /usr/local
-su $SUDO_USER -c 'npm install -g cherry-core cherry-spotify'
+su $SUDO_USER -c 'npm install -g cherry-core cherry-spotify cherry-wit cherry-hue cherry-gpio'
+curl -L -o $(dirname $CHERRY_CONFIG)/cambridge.coffee \
+  https://raw.githubusercontent.com/wit-ai/cherry/master/contrib/cambridge.coffee
 
 # install witd
-curl -L -o witd https://github.com/wit-ai/witd/raw/master/witd-arm
+curl -L -o witd -spotifyhttps://github.com/wit-ai/witd/raw/master/witd-arm
 
 cat > $CHERRY_CONFIG <<EOF
 {
@@ -106,13 +108,12 @@ cat > $CHERRY_CONFIG <<EOF
   ],
   "plugins": [
     "cherry-spotify",
-    "./tts.js",
     "cherry.integration.hipchat",
     "cherry.integration.wit",
     "cherry.integration.hue",
     "cherry.integration.gpio",
     "cherry.integration.demo_home",
-    "cherry.contrib.cambridge"
+    "./cambridge.coffee"
   ]
 }
 EOF
