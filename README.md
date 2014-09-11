@@ -69,8 +69,7 @@ In your `config.json` file, you specify the list of plugins you want to use.
 Each item can either be:
 - the name of a globally or locally installed npm package, e.g. `cherry-spotify`
 - a path to a Javascript file, e.g. `./examples/lightswitch.js`
-- a ClojureScript module (we're still figuring out how to allow cljs plugins)
-- a CoffeeScript file (coming soon...)
+- a CoffeeScript file
 
 ## Creating a plugin
 
