@@ -1,6 +1,6 @@
 {
   "name": "cherry-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Home automation nerve center",
   "keywords": [
     "home automation",
@@ -14,8 +14,6 @@
   "dependencies": {
     "coffee-script": "^1.8.0",
     "node-xmpp": "1.0.0-alpha2",
-    "onoff": "^0.3.2",
-    "request": "2.39.0",
     "ws": "^0.4.31"
   },
   "devDependencies": {},
