@@ -160,7 +160,7 @@ node dist/cherry.js
 We use cherry everyday at the office and have put together a small script that should get everything up and running from a Raspberry Pi:
 
 ```bash
-curl -s https://github.com/wit-ai/witd/raw/master/cambridge.sh | sudo -E sh
+curl -s https://raw.githubusercontent.com/wit-ai/cherry/master/cambridge.sh | sudo -E sh
 ```
 
 ## TODO
