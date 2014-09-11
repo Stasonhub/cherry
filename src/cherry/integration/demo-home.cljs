@@ -6,15 +6,15 @@
   (:require-macros [cljs.core.async.macros :refer [go alt! go-loop]]))
 
 (defn debug [& args]
-  (apply util/debug "[witd]" args))
+  (apply util/debug "[demo]" args))
 
 (defn log [& args]
-  (apply println "[Demo]" args))
+  (apply println "[demo]" args))
 
 (def WebSocketServer (.-Server (js/require "ws")))
 
 (defn connect!
-  [demo-page-port ->demo-page]
+  [demo-page-port ->demo-page ->ec]
   (let [fmt (juxt (comp :intent first :outcomes)
                   (comp :entities first :outcomes)
                   identity)
@@ -36,7 +36,18 @@
                                       clj->js
                                       js/JSON.stringify
                                       (->> (.send ws)))
-                                  (recur))))))))))
+                                  (recur))))
+
+                            (.on ws "message"
+                                 (fn [msg]
+                                   (try (let [x (js/JSON.parse msg)]
+                                          (put! ->ec x))
+                                        (catch :default e
+                                          (log "could not parse" msg))))))))
+      (.on "error" (fn [err]
+                     (log "error" err)))
+
+      )))
 
 (defn consume-wit-command
   [wit-body ->demo-page]
@@ -44,8 +55,14 @@
 
 (defn ^:export init [ec]
   (go (let [<-ec (chan)
+            ->ec (chan)
             ->demo-page (chan)]
         (.consume ec (fn [msg] (put! <-ec msg)))
+
+        (go-loop []
+          (let [msg (<! ->ec)]
+            (.produce ec (clj->js msg))
+            (recur)))
 
         (go-loop []
           (let [msg (-> (<! <-ec)
@@ -58,4 +75,4 @@
               nil)
             (recur)))
 
-        (connect! (.-config.demo_port ec) ->demo-page))))
+        (connect! (.-config.demo_port ec) ->demo-page ->ec))))

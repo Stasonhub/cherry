@@ -17,11 +17,12 @@
     "cherry.integration.mopidy"
   ],
   "plugins": [
+    "cherry-spotify",
     "./examples/lightswitch.js",
     "cherry.integration.hipchat",
-    "cherry-spotify",
     "cherry.integration.wit",
     "cherry.integration.hue",
-    "cherry.integration.gpio"
+    "cherry.integration.gpio",
+    "cherry.contrib.cambridge"
   ]
 }

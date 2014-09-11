@@ -29,6 +29,8 @@
         (->> (.send cl)))
 
     (go-loop []
+      ;; wait 1.5s before sending message, otherwise server might reject
+      (<! (timeout 1500))
       (let [msg (<! ->hipchat)]
         (debug "sending xmpp:" msg)
         (-> (create-elt "message" {:to room+id :type "groupchat"})

@@ -1,4 +1,4 @@
-(ns cherry.integration.cambridge
+(ns cherry.contrib.cambridge
   (:require [cljs.nodejs :as nodejs]
             [cljs.core.async :as async :refer [<! >! take! put! chan timeout close!]]
             [cherry.util :as util])
@@ -16,37 +16,65 @@
 ;; Raspberry GPIO
 
 (defn do-pin [{:keys [to from body]} ->ec]
-  (cond (= "high" body) (put! ->ec {:to "lights" :body {:on false}})
-        (= "low" body) (put! ->ec {:to "lights" :body {:on true}})))
+  (cond (= "high" body) (do (put! ->ec {:to "wit" :body "stop"}))
+        (= "low" body) (do (put! ->ec {:to "wit" :body "start"}))))
 
 ;; -----------------------------------------------------------------------------
 ;; Wit
 
 (defn wit->hue [intent entities]
-  (-> (->> (hash-map :hue (-> entities :color first :value js/parseInt)
+  (-> (->> (hash-map :hue (or (-> entities :color first :value js/parseInt))
                      :alert (-> entities :alert first :value)
                      :effect (-> entities :effect first :value)
                      :light (-> entities :light first :value))
-           (filter val)
-           (remove (comp (partial = NaN) val))
+           (filter (comp boolean val))
            (into {}))
       (assoc :on (-> entities :on_off first :value (= "on")))))
 
 (defn do-wit [msg ->ec]
-  (let [outcome (-> msg :body :outcomes first)
-        intent (:intent outcome)
-        entities (:entities outcome)]
-    (case intent
-      "lights" (let [opts (wit->hue intent entities)]
-                 (debug intent "+" entities "=" opts)
-                 (put! ->ec {:to "lights" :body opts})
-                 (put! ->ec {:to "chat" :body (str "Hue: " (pr-str opts))}))
-      "play" (put! ->ec {:to "music" :body "core.playback.play"})
-      "pause" (put! ->ec {:to "music" :body "core.playback.pause"})
-      "resume" (put! ->ec {:to "music" :body "core.playback.resume"})
-      "next" (put! ->ec {:to "music" :body "core.playback.next"})
-      "previous" (put! ->ec {:to "music" :body "core.playback.previous"})
-      (log (str "did not understand intent " intent)))))
+  (when-let [outcomes (-> msg :body :outcomes)]
+    (let [outcome (first outcomes)
+          intent (:intent outcome)
+          entities (:entities outcome)
+          ->music! (fn [command & [opts]]
+                     (put! ->ec {:to "music" :body (merge {:command command}
+                                                          opts)}))
+          ->tts! (fn [body] (put! ->ec {:to "tts" :body body}))]
+      (case intent
+        "lights" (let [opts (wit->hue intent entities)]
+                   (debug intent "+" entities "=" opts)
+                   (put! ->ec {:to "lights" :body opts})
+                   (put! ->ec {:to "chat" :body (str "Hue: " (pr-str opts))}))
+        "bot_hello" (->tts! "Good day to you!")
+        "bot_name" (->tts! "My name is Samantha.")
+        "bot_sport" (->tts! "My favorite sport is volleyball. I quite like soccer too.")
+        "bot_maker" (->tts! "I have been made in Palo Alto, by the Wit team")
+        "pause" (->music! "pause")
+        "resume" (->music! "resume")
+        "party" (do (->music! "play_1" {:id "spotify:track:1CNJyTUh56oj3OCZOZ5way"})
+                    (js/setTimeout (fn [] (->music! "seek" {:seconds 58000})) 100)
+                    (put! ->ec {:to "lights" :body {:on true :alert "lselect" :effect "colorloop"}}))
+        "music_play" (do (->music! "play"))
+        "music_stop" (do (->music! "stop"))
+        "music_next" (->music! "next")
+        "music_previous" (->music! "prev")
+        "music_status" (->music! "status")
+        "music_enqueue_from_search" (let [num (-> entities :number first :value)]
+                                      (if (pos? num)
+                                        (->music! "queue_add" {:num num})
+                                        (log (str "error while adding: "
+                                                  num "is not a valid number"))))
+        "music_qclear" (->music! "queue_clear")
+        "music_qlist" (->music! "queue_ls")
+        "music_search" (->music! "search" {:query (-> entities :music first :value)})
+        ;; "music_image" (->music! "image")
+        "music_goto" (let [num (-> entities :number first :value)]
+                       (if (pos? num)
+                         (->music! "queue_goto" {:num num})
+                         (log (str "error while adding: "
+                                   num "is not a valid number"))))
+        (do (log (str "did not understand intent " intent))
+            (->tts! "I did not understand that"))))))
 
 ;; -----------------------------------------------------------------------------
 ;; Mopidy
@@ -134,9 +162,10 @@
             _ (debug "read message" msg)
             state' (case (-> msg :from keyword)
                      :pin (do-pin msg ->ec)
-                     :chat (put! ->ec {:to "wit" :body (:body msg)})
+                     :chat (do (put! ->ec {:to "wit" :body (:body msg)})
+                               state)
                      :wit (do-wit msg ->ec)
-                     :music (do-mopidy msg state ->ec)
+                     :music state #_(put! ->ec {:to "tts" :body (:body msg)})
                      :gesture (do-myo msg ->ec)
 
                      nil)]

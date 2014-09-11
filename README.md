@@ -153,6 +153,14 @@ cp config.json.sample config.json
 node dist/cherry.js
 ```
 
+## Cambridge
+
+We use cherry everyday at the office and have put together a small script that should get everything up and running from a Raspberry Pi:
+
+```bash
+curl -s https://github.com/wit-ai/witd/raw/master/cambridge.sh | sudo -E sh
+```
+
 ## TODO
 
 - allow CoffeeScript plugins
