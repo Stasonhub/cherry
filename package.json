@@ -2,9 +2,17 @@
   "name": "cherry-core",
   "version": "0.1.6",
   "description": "Home automation nerve center",
-  "keywords": ["home automation", "home", "automation", "voice", "pi", "raspberry"],
+  "keywords": [
+    "home automation",
+    "home",
+    "automation",
+    "voice",
+    "pi",
+    "raspberry"
+  ],
   "main": "cherry.js",
   "dependencies": {
+    "coffee-script": "^1.8.0",
     "node-xmpp": "1.0.0-alpha2",
     "onoff": "^0.3.2",
     "request": "2.39.0",
@@ -34,5 +42,7 @@
     "url": "https://github.com/wit-ai/cherry/issues"
   },
   "homepage": "https://github.com/wit-ai/cherry",
-  "bin": { "cherry": "./cherry.js" }
+  "bin": {
+    "cherry": "./cherry.js"
+  }
 }

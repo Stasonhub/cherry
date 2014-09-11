@@ -12,6 +12,7 @@
 (def fs (js/require "fs"))
 (def path (js/require "path"))
 (def child_process (js/require "child_process"))
+(js/require "coffee-script/register")
 
 (nodejs/enable-util-print!)
 
@@ -51,24 +52,40 @@
 (defn load-cljs-module! [m paths]
   (aget (js/eval m) "init"))
 
+(def plugins (atom {}))
 (defn load-module! [config firehose m paths mult]
   (let [f (if (cljs? m)
             (load-cljs-module! m paths)
-            (load-js-module! m paths))]
-    (f #js {:consume (fn [h]
-                       (let [ch (chan)]
-                         (async/tap mult ch)
-                         (go-loop []
-                           (let [[sender msg] (<! ch)]
-                             (util/debug m "consumed" msg)
-                             (when (and (not (nil? msg))
-                                        (not (= m sender)))
-                               (h (clj->js msg)))
-                             (recur)))))
+            (load-js-module! m paths))
+        consume (fn [h]
+                  (let [ch (chan)]
+                    (async/tap mult ch)
+                    (go-loop []
+                      (let [[sender msg] (<! ch)]
+                        (when (and (not (nil? msg))
+                                   (not (= m sender)))
+                          (h (clj->js msg)))
+                        (recur)))))]
+    (f #js {:consume consume
             :config config
+            :plugins (fn [] (clj->js @plugins))
             :produce (fn [x]
                        (println ">" (str m ":") x)
-                       (put! firehose [m x]))})))
+                       (put! firehose [m x]))
+            :handle (fn [mapping]
+                         (let [m (js->clj mapping :keywordize-keys true)]
+                           (consume
+                            (fn [x]
+                              (let [msg (js->clj x :keywordize-keys true)
+                                    {:keys [from body]} msg]
+                                (if-let [h (get m (keyword from))]
+                                  (h (clj->js (clj->js body) (clj->js msg)))
+                                  (util/debug "no mapping" from)))))))
+            :register (fn [name g]
+                        (if (get @plugins name)
+                          (println (str "> ERROR: " name " already registered"))
+                          (swap! plugins assoc name g)))})))
+
 
 (defn load-modules!
   "Load modules from a config file and hook them to the firehose"

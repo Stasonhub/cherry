@@ -1,6 +1,6 @@
 (ns cherry.util)
 
-(def debug? (boolean (.-env.EC_DEBUG js/process)))
+(def debug? (boolean (.-env.DEBUG js/process)))
 (def util (js/require "util"))
 
 (defn trace

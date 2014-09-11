@@ -67,7 +67,6 @@
         (go-loop []
           (let [msg (-> (<! <-ec)
                         (js->clj :keywordize-keys true))]
-            (log "consuming" msg)
             (case (keyword (:from msg))
               :wit
               (consume-wit-command (:body msg) ->demo-page)
