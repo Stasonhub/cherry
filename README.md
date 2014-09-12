@@ -27,6 +27,8 @@ module.exports = function (cherry) {
 }
 ```
 
+See this blog post for more background: https://wit.ai/blog/2014/09/12/office-automation-with-raspberry-pi.
+
 ## Using
 
 ```bash
