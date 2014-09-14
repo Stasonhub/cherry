@@ -3,9 +3,9 @@ module.exports = function (cherry) {
 
   cherry.handle({
     pin: function (message) {
-      if (msg.body === "high") {
+      if (message.body === "high") {
         cherry.hue({on: true});
-      } else if (msg.body === "low") {
+      } else if (message.body === "low") {
         cherry.hue({on: false});
       }
     }
