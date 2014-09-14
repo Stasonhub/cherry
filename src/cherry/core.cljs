@@ -61,7 +61,10 @@
                       (let [[sender msg] (<! ch)]
                         (when (and (not (nil? msg))
                                    (not (= m sender)))
-                          (h (clj->js msg)))
+                          (try
+                            (h (clj->js msg))
+                            (catch js/Error e
+                              (println (str "> ERROR: " m " got " e)))))
                         (recur)))))]
     (f #js {:consume consume
             :config config
@@ -70,14 +73,14 @@
                        (println ">" (str m ":") x)
                        (put! firehose [m x]))
             :handle (fn [mapping]
-                         (let [m (js->clj mapping :keywordize-keys true)]
-                           (consume
-                            (fn [x]
-                              (let [msg (js->clj x :keywordize-keys true)
-                                    {:keys [from body]} msg]
-                                (if-let [h (get m (keyword from))]
-                                  (h (clj->js body) (clj->js msg))
-                                  (util/debug "no mapping" from)))))))
+                      (let [m (js->clj mapping :keywordize-keys true)]
+                        (consume
+                         (fn [x]
+                           (let [msg (js->clj x :keywordize-keys true)
+                                 {:keys [from body]} msg]
+                             (if-let [h (get m (keyword from))]
+                               (h (clj->js body) (clj->js msg))
+                               (util/debug "no mapping" from)))))))
             :register (fn [name g]
                         (if (get @plugins name)
                           (println (str "> ERROR: " name " already registered"))
