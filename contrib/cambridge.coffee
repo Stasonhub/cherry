@@ -183,11 +183,11 @@ module.exports = (cherry) ->
       namespace  = repo.namespace
       repo_name  = repo.repo_name
       repo_url   = repo.repo_url
-      images     = x.push_data?.images?
+      images     = x.push_data?.images
 
       cherry.produce
         to: 'chat'
-        body: "[dockerhub] pushed #{images?.length} images at #{repo_name}: #{images.join(", ")}. More at #{repo_url}"
+        body: "[dockerhub] pushed #{images?.length} images at #{repo_name}: #{images?.join(", ")} (#{repo_url})"
 
       ###
       {
