@@ -19,6 +19,8 @@ wit_to_hue = (entities) ->
 
 module.exports = (cherry) ->
   p = cherry.plugins()
+  p.hue = ->
+  p.spop = ->
 
   intents =
     bot_hello: -> p.tts "Good day to you!"
@@ -173,3 +175,47 @@ module.exports = (cherry) ->
         f(entities || {})
       else
         console.log 'unknown intent', intent
+    dockerhub: (x) ->
+      pusher     = x.push_data?.pusher
+      repo       = x.repository
+      owner      = repo.owner
+      name       = repo.name
+      namespace  = repo.namespace
+      repo_name  = repo.repo_name
+      repo_url   = repo.repo_url
+      images     = x.push_data?.images?
+
+      cherry.produce
+        to: 'chat'
+        body: "[dockerhub] pushed #{images?.length} images at #{repo_name}: #{images.join(", ")}. More at #{repo_url}"
+
+      ###
+      {
+         "push_data":{
+            "pushed_at":1385141110,
+            "images":[
+               "imagehash1",
+               "imagehash2",
+               "imagehash3"
+            ],
+            "pusher":"username"
+         },
+         "repository":{
+            "status":"Active",
+            "description":"my docker repo that does cool things",
+            "is_trusted":false,
+            "full_description":"This is my full description",
+            "repo_url":"https://registry.hub.docker.com/u/username/reponame/",
+            "owner":"username",
+            "is_official":false,
+            "is_private":false,
+            "name":"reponame",
+            "namespace":"username",
+            "star_count":1,
+            "comment_count":1,
+            "date_created":1370174400,
+            "dockerfile":"my full dockerfile is listed here",
+            "repo_name":"username/reponame"
+         }
+      }
+      ###
