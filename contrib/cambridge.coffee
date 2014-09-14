@@ -38,11 +38,11 @@ module.exports = (cherry) ->
         spop.q.push (r) ->
           if (dym = r.did_you_mean)
             cherry.produce to: 'chat', body: "Did you mean #{dym}?"
-            return
 
-          if uri = (r.albums?[0] || r.tracks?[0]).uri
+          if (x = (r.albums?[0] || r.tracks?[0])) && (uri = x.uri)
             p.spop("uplay #{uri}")
           else
+            cherry.produce(to: 'chat', body: 'Did not find anything matching: ' + music_item)
             console.log('[spop/play] did not find uri', Object.keys(r))
         escaped = music_item.replace('"', '')
         p.spop("search \"#{escaped}\"")
