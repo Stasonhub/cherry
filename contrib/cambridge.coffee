@@ -172,7 +172,7 @@ module.exports = (cherry) ->
       if f = intents[intent]
         f(entities || {})
       else
-        console.log 'unknown intent', intent
+        console.log '[wit] unknown intent', intent
     dockerhub: (x) ->
       push_data  = x.push_data
       repo       = x.repository

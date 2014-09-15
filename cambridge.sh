@@ -75,7 +75,7 @@ dpkg -i $NODE
 
 # install cherry and its plugins
 chown -R $SUDO_USER /usr/local
-su $SUDO_USER -c 'npm install -g cherry-core cherry-spotify cherry-wit cherry-hue cherry-gpio'
+su $SUDO_USER -c 'npm install -g cherry-core cherry-spotify cherry-wit cherry-hue cherry-gpio cherry-webhooks'
 curl -L -o $(dirname $CHERRY_CONFIG)/cambridge.coffee \
   https://raw.githubusercontent.com/wit-ai/cherry/master/contrib/cambridge.coffee
 
