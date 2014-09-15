@@ -19,8 +19,6 @@ wit_to_hue = (entities) ->
 
 module.exports = (cherry) ->
   p = cherry.plugins()
-  p.hue = ->
-  p.spop = ->
 
   intents =
     bot_hello: -> p.tts "Good day to you!"

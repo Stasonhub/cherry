@@ -58,7 +58,9 @@
                   (let [ch (chan)]
                     (async/tap mult ch)
                     (go-loop []
+                      (util/debug "[" m "] waiting")
                       (let [[sender msg] (<! ch)]
+                        (util/debug "[" m "] got" sender msg)
                         (when (and (not (nil? msg))
                                    (not (= m sender)))
                           (try
