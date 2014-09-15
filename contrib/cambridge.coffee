@@ -176,18 +176,23 @@ module.exports = (cherry) ->
       else
         console.log 'unknown intent', intent
     dockerhub: (x) ->
-      pusher     = x.push_data?.pusher
+      push_data  = x.push_data
       repo       = x.repository
-      owner      = repo.owner
-      name       = repo.name
-      namespace  = repo.namespace
-      repo_name  = repo.repo_name
-      repo_url   = repo.repo_url
-      images     = x.push_data?.images
+      owner      = repo?.owner
+      name       = repo?.name
+      namespace  = repo?.namespace
+      repo_name  = repo?.repo_name
+      repo_url   = repo?.repo_url
+      images     = push_data?.images
+      pusher     = push_data?.pusher
+
+      body = "[dockerhub] #{pusher} pushed to #{repo_name}"
+      if images?.length
+        body += " (#{images?.length || 0} images: #{images?.join(", ")})"
 
       cherry.produce
         to: 'chat'
-        body: "[dockerhub] pushed #{images?.length} images at #{repo_name}: #{images?.join(", ")} (#{repo_url})"
+        body: body
 
       ###
       {
