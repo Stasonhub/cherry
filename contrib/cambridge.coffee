@@ -139,10 +139,8 @@ module.exports = (cherry) ->
     chat: (x) -> p.wit(text: x) # send all chats to wit
     pin: (x) ->
       if x.state == 'low'
-        p.hue(on: false)
         p.wit(mic: 'stop')
       else
-        p.hue(on: true)
         p.wit(mic: 'start')
     spop: (x) ->
       if (f = spop.q.shift())

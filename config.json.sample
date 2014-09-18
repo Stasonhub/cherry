@@ -14,15 +14,16 @@
   },
   "unused": [
     "cherry.integration.myo",
-    "cherry.integration.mopidy"
+    "./examples/light_switch.js"
   ],
   "plugins": [
     "cherry-spotify",
-    "./examples/lightswitch.js",
+    "cherry-hue",
+    "cherry-gpio",
+    "cherry-wit",
+    "cherry-webhooks",
+    "cherry.integration.demo_home",
     "cherry.integration.hipchat",
-    "cherry.integration.wit",
-    "cherry.integration.hue",
-    "cherry.integration.gpio",
-    "cherry.contrib.cambridge"
+    "./contrib/cambridge.coffee"
   ]
 }
