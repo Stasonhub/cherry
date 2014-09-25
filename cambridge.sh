@@ -80,7 +80,7 @@ curl -L -o $(dirname $CHERRY_CONFIG)/cambridge.coffee \
   https://raw.githubusercontent.com/wit-ai/cherry/master/contrib/cambridge.coffee
 
 # install witd
-curl -L -o witd -spotifyhttps://github.com/wit-ai/witd/raw/master/witd-arm
+curl -L -o witd https://github.com/wit-ai/witd/raw/master/witd-arm
 
 cat > $CHERRY_CONFIG <<EOF
 {
