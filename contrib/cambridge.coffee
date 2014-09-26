@@ -13,7 +13,7 @@ wit_to_hue = (entities) ->
   if x = entities.light?[0].value
     opts.light = x
   if x = entities.on_off?[0].value
-    opts.on = !!x
+    opts.on = x == "on"
 
   return opts
 
@@ -48,6 +48,7 @@ module.exports = (cherry) ->
         p.spop("search \"#{escaped}\"")
       else
         p.spop('play')
+    video_play: (entities) -> p.youtube(entities)
     music_stop: -> p.spop('stop')
     music_pause: -> p.spop 'toggle'
     music_resume: -> p.spop 'resume'
