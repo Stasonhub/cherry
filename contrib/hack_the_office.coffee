@@ -139,6 +139,15 @@ module.exports = (cherry) ->
   cherry.handle
     chat: (x) ->
       p.wit(text: x) # send all chats to wit
+    queue: (x) ->
+      return if !x.outcomes || !x.outcomes.length
+      outcome = x.outcomes[0]
+      intent = outcome.intent
+      entities = outcome.entities
+      if f = intents[intent]
+        f(entities || {})
+      else
+        console.log '[wit] unknown intent', intent
     pin: (x) ->
       if x.state == 'low'
         p.wit(mic: 'stop')
@@ -167,10 +176,11 @@ module.exports = (cherry) ->
       outcome = x.outcomes[0]
       intent = outcome.intent
       entities = outcome.entities
-      if f = intents[intent]
-        f(entities || {})
-      else
-        console.log '[wit] unknown intent', intent
+      switch intent
+        when 'hto_queue_pop' then p.queue(pop: 'foo')
+        when 'hto_queue_toggle' then p.queue(toggle: 'bar')
+        when 'hto_queue_delay' then p.queue(delay: entities.duration[0].value)
+        else p.queue(push: x)
     dockerhub: (x) ->
       push_data  = x.push_data
       repo       = x.repository
