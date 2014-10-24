@@ -136,6 +136,13 @@ module.exports = (cherry) ->
       else
         console.log('[spop/enqueue] not in queue', n)
 
+  # myo specific
+  myo_state =
+    timeout: null
+    fisting: false
+    pinky: false
+    w: 0
+
   cherry.handle
     chat: (x) ->
       p.wit(text: x) # send all chats to wit
@@ -156,12 +163,30 @@ module.exports = (cherry) ->
 
       # p.hipchat(JSON.stringify(x))
     myo: (x) ->
-      if x == 'wave_in'
-        p.hue(on: true, lights: [1, 2])
-      else if x == 'wave_out'
-        p.hue(on: false, lights: [1, 2])
-      else
-        console.log('unknown myo: ' + x)
+      if x.type == 'pose'
+        pose = x.pose
+        switch pose
+          when 'thumb_to_pinky'
+            myo_state.pinky = true
+            clearTimeout(myo_state.timeout)
+            myo_state.timeout = setTimeout (-> myo_state.pinky = false), 2000
+          when 'fist'
+            myo_state.fisting = true
+            myo_state.fist_w = myo_state.w
+          when 'rest'
+            if myo_state == 'fisting'
+              myo_state.fisting = false
+          when 'wave_in'
+            if myo_state.pinky
+              p.hue(on: true, lights: [1, 2])
+          when 'wave_out'
+            if myo_state.pinky
+              p.hue(on: false, lights: [1, 2])
+      else if x.type == 'orientation'
+        myo_state.w = (x.orientation.w | 0)
+        if !!myo_state.fisting
+          yes
+
     wit: (x) ->
       return if !x.outcomes || !x.outcomes.length
       outcome = x.outcomes[0]
