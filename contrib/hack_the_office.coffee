@@ -29,6 +29,11 @@ module.exports = (cherry) ->
       p.spop 'uplay spotify:track:1CNJyTUh56oj3OCZOZ5way'
       setTimeout (-> p.spop "seek", seconds: 58200), 75
       p.hue(on: true, alert: 'lselect', effect: 'colorloop')
+    disco_ball: (entities) ->
+      p.email
+        to: 'trigger@recipe.ifttt.com'
+        subject: '#' + entities?.on_off?[0].value
+        body: ''
     lights: (entities) ->
       # (put! ->ec {:to "chat" :body (str "Hue: " (pr-str opts))}))
       p.hue(wit_to_hue(entities))
