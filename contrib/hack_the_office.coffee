@@ -188,8 +188,7 @@ module.exports = (cherry) ->
           s = entities.duration.reduce (sum, curr) ->
                 sum += curr.value
               , 0
-          if !x.cherry.from
-            p.queue(delay: s)
+          p.queue(delay: s) unless x.cherry.msg.from
         else p.queue(push: x)
     dockerhub: (x) ->
       push_data  = x.push_data
