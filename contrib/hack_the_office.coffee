@@ -170,21 +170,26 @@ module.exports = (cherry) ->
 
       # p.hipchat(JSON.stringify(x))
     myo: (x) ->
-      if x == 'wave_in'
-        p.hue(on: true, lights: [1, 2])
-      else if x == 'wave_out'
-        p.hue(on: false, lights: [1, 2])
-      else
-        console.log('unknown myo: ' + x)
+      if x.type == 'pose'
+        pose = x.pose
+        if pose == 'wave_in'
+          p.hue(on: true, lights: [1, 2])
+        else if pose == 'wave_out'
+          p.hue(on: false, lights: [1, 2])
     wit: (x) ->
       return if !x.outcomes || !x.outcomes.length
       outcome = x.outcomes[0]
       intent = outcome.intent
       entities = outcome.entities
       switch intent
-        when 'hto_queue_pop' then p.queue(pop: 'foo')
-        when 'hto_queue_toggle' then p.queue(toggle: 'bar')
-        when 'hto_queue_delay' then p.queue(delay: entities.duration[0].value)
+        when 'hto_queue_pop' then p.queue(pop: 'foo') unless x.cherry.msg.from
+        when 'hto_queue_toggle' then p.queue(toggle: 'bar') unless x.cherry.msg.from
+        when 'hto_queue_delay'
+          s = entities.duration.reduce (sum, curr) ->
+                sum += curr.value
+              , 0
+          if !x.cherry.from
+            p.queue(delay: s)
         else p.queue(push: x)
     dockerhub: (x) ->
       push_data  = x.push_data
