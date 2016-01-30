@@ -6,7 +6,7 @@
   (:require-macros [cljs.core.async.macros :refer [go alt! go-loop]]))
 
 (def util (js/require "util"))
-(def xmpp (js/require "node-xmpp"))
+(def xmpp (js/require "node-xmpp-client"))
 
 (defn debug [& args]
   (apply util/debug "[HipChat]" args))

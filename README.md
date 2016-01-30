@@ -121,9 +121,9 @@ Produces: "from: chat"
 ## Dev
 
 ```bash
-lein do cljsbuild clean, cljsbuild auto
 cp config.json.sample config.json
-node dist/cherry.js
+lein cljsbuild auto
+node dist/cherry.js config.json
 ```
 
 ## Cambridge
