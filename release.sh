@@ -1,8 +1,8 @@
 #!/bin/sh
 
-set -e -x
+set -ex
 
-# lein do cljsbuild clean, cljsbuild once
+lein do clean, cljsbuild once
 cp package.json dist/
 cp README.md dist/
 
